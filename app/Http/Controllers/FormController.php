@@ -30,19 +30,17 @@ class FormController extends Controller
             'status' => $request->status
         ]);
 
-        // ❗ Default fields (NOT stored in DB)
+        // ❗ Default fields (NOT stored)
         $defaultFields = ['name', 'email', 'phone'];
 
         if ($request->fields) {
-
             foreach ($request->fields as $field) {
 
-                // skip empty
                 if (!isset($field['label']) || trim($field['label']) == '') continue;
 
                 $label = strtolower(trim($field['label']));
 
-                // ❌ skip duplicate default fields
+                // ❌ Skip default fields
                 if (in_array($label, $defaultFields)) continue;
 
                 $form->fields()->create([
@@ -50,14 +48,14 @@ class FormController extends Controller
                     'type' => $field['type'] ?? 'text',
                     'required' => isset($field['required']) ? 1 : 0,
 
-                    // ✅ FIX (array → string)
+                    // ✅ FIX
                     'validation' => isset($field['validation'])
                         ? implode('|', $field['validation'])
                         : null,
 
                     'order' => $field['order'] ?? 0,
 
-                    // ✅ store as string
+                    // ✅ FIX
                     'options' => $field['options'] ?? null,
                 ]);
             }
@@ -71,6 +69,63 @@ class FormController extends Controller
         $form = Form::with('fields')->findOrFail($id);
         return view('admin.forms.show', compact('form'));
     }
+    // EDIT FORM PAGE
+public function edit($id)
+{
+    $form = Form::with('fields')->findOrFail($id);
+
+    return view('admin.forms.edit', compact('form'));
+}
+
+
+// UPDATE FORM
+public function update(Request $request, $id)
+{
+    $form = Form::findOrFail($id);
+
+    $form->update([
+        'title' => $request->title,
+        'status' => $request->status
+    ]);
+
+    // delete old fields
+    $form->fields()->delete();
+
+    // re-insert fields
+    if ($request->fields) {
+        foreach ($request->fields as $field) {
+
+            if (!isset($field['label']) || trim($field['label']) == '') continue;
+
+            $form->fields()->create([
+                'label' => $field['label'],
+                'type' => $field['type'] ?? 'text',
+                'required' => isset($field['required']) ? 1 : 0,
+                'validation' => isset($field['validation']) 
+                    ? implode('|', $field['validation']) 
+                    : null,
+                'order' => $field['order'] ?? 0,
+                'options' => $field['options'] ?? null,
+            ]);
+        }
+    }
+
+    return redirect('/admin/forms')->with('success', 'Form Updated');
+}
+
+
+public function destroy($id)
+{
+    $form = Form::findOrFail($id);
+
+    // delete related fields first
+    $form->fields()->delete();
+
+    // delete form
+    $form->delete();
+
+    return redirect('/admin/forms')->with('success', 'Form Deleted Successfully');
+}
 
     public function userForms()
     {
@@ -90,7 +145,7 @@ class FormController extends Controller
 
         $rules = [];
 
-        // ✅ DEFAULT VALIDATION
+        // ✅ DEFAULT FIELDS VALIDATION
         $rules['name'] = 'required';
         $rules['email'] = 'required|email';
         $rules['phone'] = 'nullable|numeric';
@@ -114,6 +169,7 @@ class FormController extends Controller
 
         $validated = $request->validate($rules);
 
+        // ✅ FINAL DATA STORE
         $finalData = [
             'Name' => $request->name,
             'Email' => $request->email,
@@ -121,7 +177,14 @@ class FormController extends Controller
         ];
 
         foreach ($form->fields as $field) {
-            $finalData[$field->label] = $validated['field_' . $field->id] ?? null;
+            $value = $validated['field_' . $field->id] ?? null;
+
+            // ✅ handle checkbox array
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
+
+            $finalData[$field->label] = $value;
         }
 
         Submission::create([

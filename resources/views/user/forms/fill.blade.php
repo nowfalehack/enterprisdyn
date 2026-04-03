@@ -12,12 +12,34 @@
 
     <!-- FORM CARD -->
     <div class="card shadow border-0 rounded-4">
-
         <div class="card-body p-4">
 
             <form method="POST" action="{{ route('form.submit', $form->id) }}">
             @csrf
 
+            <!-- ✅ DEFAULT FIELDS -->
+            <div class="mb-4">
+                <label class="fw-semibold">Name *</label>
+                <input type="text" name="name" class="form-control"
+                       value="{{ old('name') }}">
+                @error('name') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="fw-semibold">Email *</label>
+                <input type="email" name="email" class="form-control"
+                       value="{{ old('email') }}">
+                @error('email') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="fw-semibold">Phone</label>
+                <input type="text" name="phone" class="form-control"
+                       value="{{ old('phone') }}">
+                @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+
+            <!-- ✅ DYNAMIC FIELDS -->
             @foreach($form->fields as $field)
 
                 @php
@@ -26,7 +48,6 @@
 
                 <div class="mb-4">
 
-                    <!-- LABEL -->
                     <label class="form-label fw-semibold">
                         {{ $field->label }}
                         @if($field->required)
@@ -34,37 +55,32 @@
                         @endif
                     </label>
 
-                    <!-- TEXT -->
                     @if($field->type == 'text')
                         <input type="text"
                                name="field_{{ $field->id }}"
                                value="{{ old('field_'.$field->id) }}"
-                               class="form-control rounded-3">
+                               class="form-control">
 
-                    <!-- EMAIL -->
                     @elseif($field->type == 'email')
                         <input type="email"
                                name="field_{{ $field->id }}"
                                value="{{ old('field_'.$field->id) }}"
-                               class="form-control rounded-3">
+                               class="form-control">
 
-                    <!-- NUMBER -->
                     @elseif($field->type == 'number')
                         <input type="number"
                                name="field_{{ $field->id }}"
                                value="{{ old('field_'.$field->id) }}"
-                               class="form-control rounded-3">
+                               class="form-control">
 
-                    <!-- DATE -->
                     @elseif($field->type == 'date')
                         <input type="date"
                                name="field_{{ $field->id }}"
                                value="{{ old('field_'.$field->id) }}"
-                               class="form-control rounded-3">
+                               class="form-control">
 
-                    <!-- SELECT -->
                     @elseif($field->type == 'select')
-                        <select name="field_{{ $field->id }}" class="form-control rounded-3">
+                        <select name="field_{{ $field->id }}" class="form-control">
                             <option value="">-- Select --</option>
                             @foreach($options as $opt)
                                 <option value="{{ trim($opt) }}"
@@ -74,7 +90,6 @@
                             @endforeach
                         </select>
 
-                    <!-- CHECKBOX -->
                     @elseif($field->type == 'checkbox')
                         <div class="mt-2">
                             @foreach($options as $opt)
@@ -92,7 +107,6 @@
                         </div>
                     @endif
 
-                    <!-- ERROR -->
                     @error('field_'.$field->id)
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -109,7 +123,6 @@
             </form>
 
         </div>
-
     </div>
 
 </div>

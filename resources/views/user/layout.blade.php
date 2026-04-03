@@ -17,30 +17,30 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #fff;
-            overflow-x: hidden;
+            background: #f8fafc;
+            color: #1e293b;
         }
 
         /* Sidebar */
         .sidebar {
             width: 260px;
             height: 100vh;
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(12px);
+            background: #ffffff;
             padding: 25px 15px;
             position: fixed;
             top: 0;
             left: 0;
+            border-right: 1px solid #e5e7eb;
         }
 
         .sidebar h4 {
             font-weight: 600;
             margin-bottom: 30px;
+            color: #111827;
         }
 
         .sidebar a {
-            color: #9ca3af;
+            color: #6b7280;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -55,22 +55,20 @@
         .sidebar a.active {
             background: #2563eb;
             color: #fff;
-            transform: translateX(5px);
         }
 
         /* Topbar */
         .topbar {
             height: 70px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 25px;
         }
 
-        .topbar .user-box {
+        .user-box {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -81,6 +79,7 @@
             height: 40px;
             border-radius: 50%;
             background: #2563eb;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,23 +93,13 @@
         }
 
         /* Cards */
-        .glass-card {
-            background: rgba(255,255,255,0.05);
+        .card {
             border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: 0.3s;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
         }
 
         /* Buttons */
         .btn-modern {
             border-radius: 30px;
-            padding: 8px 18px;
         }
 
         /* Scroll */
@@ -145,7 +134,7 @@
             <i class="fas fa-database"></i> My Submissions
         </a>
 
-        <hr class="text-secondary">
+        <hr>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
@@ -162,14 +151,14 @@
         <!-- Topbar -->
         <div class="topbar">
 
-            <h5 class="mb-0">✨ Welcome Back</h5>
+            <h5 class="mb-0 text-dark">Welcome Back 👋</h5>
 
             <div class="user-box">
                 <div class="avatar">
                     {{ strtoupper(substr(auth()->user()->name,0,1)) }}
                 </div>
                 <div>
-                    <div class="fw-bold">{{ auth()->user()->name }}</div>
+                    <div class="fw-bold text-dark">{{ auth()->user()->name }}</div>
                     <small class="text-muted">{{ auth()->user()->email }}</small>
                 </div>
             </div>

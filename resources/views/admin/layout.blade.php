@@ -9,29 +9,30 @@
     <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Premium Styles -->
     <style>
         body {
-            background: #f1f5f9;
+            background: #f8fafc;
             font-family: 'Segoe UI', sans-serif;
+            color: #1e293b;
         }
 
         /* SIDEBAR */
         .sidebar {
             width: 260px;
             height: 100vh;
-            background: linear-gradient(180deg, #0f172a, #020617);
-            color: #fff;
+            background: #ffffff;
             position: fixed;
             padding: 20px;
+            border-right: 1px solid #e5e7eb;
         }
 
         .sidebar h4 {
             font-weight: bold;
+            color: #111827;
         }
 
         .sidebar a {
-            color: #cbd5f5;
+            color: #6b7280;
             text-decoration: none;
             padding: 10px 12px;
             display: block;
@@ -39,8 +40,9 @@
             transition: 0.3s;
         }
 
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.08);
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #2563eb;
             color: #fff;
         }
 
@@ -52,14 +54,14 @@
 
         /* NAVBAR */
         .navbar {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         /* CARDS */
         .card {
-            border-radius: 20px;
+            border-radius: 15px;
+            border: none;
         }
 
         /* BUTTON */
@@ -70,6 +72,19 @@
         /* LOGOUT */
         .logout-btn {
             border-radius: 12px;
+        }
+
+        /* Avatar */
+        .avatar {
+            background: #2563eb;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
 
     </style>
@@ -84,7 +99,7 @@
 
         <h4 class="mb-4">🚀 Admin</h4>
 
-        <a href="/admin/dashboard">
+        <a href="/admin/dashboard" class="active">
             <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </a>
 
@@ -122,7 +137,7 @@
         <!-- NAVBAR -->
         <nav class="navbar px-4 py-3 d-flex justify-content-between">
 
-            <div class="fw-bold">
+            <div class="fw-bold text-dark">
                 📊 Admin Dashboard
             </div>
 
@@ -132,8 +147,7 @@
                     👤 {{ auth()->user()->name }}
                 </span>
 
-                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                     style="width:40px;height:40px;">
+                <div class="avatar">
                     {{ strtoupper(substr(auth()->user()->name,0,1)) }}
                 </div>
 

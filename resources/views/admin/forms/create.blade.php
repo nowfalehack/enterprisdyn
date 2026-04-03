@@ -4,15 +4,13 @@
 
 <div class="card p-4 shadow rounded-4">
 
-    <h3 class="fw-bold mb-3">🧾 Create Form</h3>
+    <h3>Create Form</h3>
 
     <form method="POST" action="/admin/forms">
         @csrf
 
-        <label>Form Title</label>
-        <input name="title" class="form-control mb-3" required>
+        <input name="title" class="form-control mb-3" placeholder="Form Title" required>
 
-        <label>Status</label>
         <select name="status" class="form-control mb-3">
             <option value="1">Active</option>
             <option value="0">Inactive</option>
@@ -22,8 +20,6 @@
             Default Fields: Name, Email, Phone
         </div>
 
-        <h5>Dynamic Fields</h5>
-
         <div id="fields"></div>
 
         <button type="button" onclick="addField()" class="btn btn-primary mt-3">
@@ -31,7 +27,6 @@
         </button>
 
         <button class="btn btn-success mt-3">Save</button>
-
     </form>
 </div>
 
@@ -65,7 +60,6 @@ function addField(){
             <button type="button" onclick="this.parentElement.remove()" class="btn btn-danger btn-sm">
                 Remove
             </button>
-
         </div>
     `);
 
