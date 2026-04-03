@@ -10,7 +10,7 @@ class FormController extends Controller
 {
     public function index()
     {
-        $forms = Form::all();
+        $forms = Form::latest()->get();
         return view('admin.forms.index', compact('forms'));
     }
 
@@ -21,32 +21,61 @@ class FormController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['title' => 'required']);
+        $request->validate([
+            'title' => 'required'
+        ]);
 
         $form = Form::create([
             'title' => $request->title,
-            'status' => 1
+            'status' => $request->status
         ]);
 
+        // ❗ Default fields (NOT stored in DB)
+        $defaultFields = ['name', 'email', 'phone'];
+
         if ($request->fields) {
+
             foreach ($request->fields as $field) {
 
+                // skip empty
                 if (!isset($field['label']) || trim($field['label']) == '') continue;
+
+                $label = strtolower(trim($field['label']));
+
+                // ❌ skip duplicate default fields
+                if (in_array($label, $defaultFields)) continue;
 
                 $form->fields()->create([
                     'label' => $field['label'],
                     'type' => $field['type'] ?? 'text',
                     'required' => isset($field['required']) ? 1 : 0,
-                    'validation' => $field['validation'] ?? null,
-                    'order' => $field['order'] ?? 0,
-                    'options' => isset($field['options']) 
-                        ? explode(',', $field['options']) 
+
+                    // ✅ FIX (array → string)
+                    'validation' => isset($field['validation'])
+                        ? implode('|', $field['validation'])
                         : null,
+
+                    'order' => $field['order'] ?? 0,
+
+                    // ✅ store as string
+                    'options' => $field['options'] ?? null,
                 ]);
             }
         }
 
-        return redirect('/admin/forms')->with('success','Form Created');
+        return redirect('/admin/forms')->with('success', 'Form Created');
+    }
+
+    public function show($id)
+    {
+        $form = Form::with('fields')->findOrFail($id);
+        return view('admin.forms.show', compact('form'));
+    }
+
+    public function userForms()
+    {
+        $forms = Form::where('status', 1)->get();
+        return view('user.forms', compact('forms'));
     }
 
     public function fillForm($id)
@@ -55,37 +84,44 @@ class FormController extends Controller
         return view('user.forms.fill', compact('form'));
     }
 
-    // 🔥 FULL DYNAMIC VALIDATION ENGINE
     public function submit(Request $request, $id)
     {
         $form = Form::with('fields')->findOrFail($id);
 
         $rules = [];
 
+        // ✅ DEFAULT VALIDATION
+        $rules['name'] = 'required';
+        $rules['email'] = 'required|email';
+        $rules['phone'] = 'nullable|numeric';
+
+        // ✅ DYNAMIC VALIDATION
         foreach ($form->fields as $field) {
 
             $rule = [];
 
             if ($field->required) $rule[] = 'required';
 
-            // FULL dynamic validation
             if (!empty($field->validation)) {
                 $rule = array_merge($rule, explode('|', $field->validation));
             }
 
-            // fallback safety
             if ($field->type == 'email') $rule[] = 'email';
             if ($field->type == 'number') $rule[] = 'numeric';
 
-            $rules['field_'.$field->id] = $rule;
+            $rules['field_' . $field->id] = $rule;
         }
 
         $validated = $request->validate($rules);
 
-        $finalData = [];
+        $finalData = [
+            'Name' => $request->name,
+            'Email' => $request->email,
+            'Phone' => $request->phone,
+        ];
 
         foreach ($form->fields as $field) {
-            $finalData[$field->label] = $validated['field_'.$field->id] ?? null;
+            $finalData[$field->label] = $validated['field_' . $field->id] ?? null;
         }
 
         Submission::create([
@@ -94,6 +130,6 @@ class FormController extends Controller
             'data' => $finalData
         ]);
 
-        return back()->with('success','Form Submitted!');
+        return back()->with('success', 'Form Submitted!');
     }
 }
